@@ -12,11 +12,11 @@ jobs:
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-      - name: Create dummy google-services.json
+      - name: Create google-services.json with correct package
         run: |
-          mkdir -p app/src/debug
-          echo '{"project_info":{"project_number":"123456789","project_id":"studyai-dummy","storage_bucket":"studyai-dummy.appspot.com"},"client":[{"client_info":{"mobilesdk_app_id":"1:123456789:android:dummy","android_client_info":{"package_name":"com.example.studyai"}},"oauth_client":[],"api_key":[{"current_key":"dummy_key"}],"services":{"appinvite_service":{"other_platform_oauth_client":[]}}}],"configuration_version":"1"}' > app/google-services.json
-          cp app/google-services.json app/src/debug/google-services.json
+          PKG=$(grep applicationId app/build.gradle | head -1 | cut -d'"' -f2)
+          echo "Found package: $PKG"
+          echo "{\"project_info\":{\"project_number\":\"123456789\",\"project_id\":\"dummy\",\"storage_bucket\":\"dummy.appspot.com\"},\"client\":[{\"client_info\":{\"mobilesdk_app_id\":\"1:123456789:android:dummy\",\"android_client_info\":{\"package_name\":\"$PKG\"}},\"oauth_client\":[],\"api_key\":[{\"current_key\":\"dummy\"}],\"services\":{\"appinvite_service\":{\"other_platform_oauth_client\":[]}}}],\"configuration_version\":\"1\"}" > app/google-services.json
       - name: Build Debug APK
         run: gradle assembleDebug
       - name: Upload APK
