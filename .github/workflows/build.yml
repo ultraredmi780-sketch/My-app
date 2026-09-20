@@ -12,17 +12,15 @@ jobs:
           distribution: 'temurin'
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+      - name: Create dummy google-services.json
+        run: |
+          mkdir -p app/src/debug
+          echo '{"project_info":{"project_number":"123456789","project_id":"studyai-dummy","storage_bucket":"studyai-dummy.appspot.com"},"client":[{"client_info":{"mobilesdk_app_id":"1:123456789:android:dummy","android_client_info":{"package_name":"com.example.studyai"}},"oauth_client":[],"api_key":[{"current_key":"dummy_key"}],"services":{"appinvite_service":{"other_platform_oauth_client":[]}}}],"configuration_version":"1"}' > app/google-services.json
+          cp app/google-services.json app/src/debug/google-services.json
       - name: Build Debug APK
         run: gradle assembleDebug
-      - name: Build Debug AAB
-        run: gradle bundleDebug
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: apk
           path: app/build/outputs/apk/debug/*.apk
-      - name: Upload AAB
-        uses: actions/upload-artifact@v4
-        with:
-          name: aab
-          path: app/build/outputs/bundle/debug/*.aab
